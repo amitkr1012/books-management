@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.5</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.digicert.books.management</groupId>
+	<artifactId>books-management-openapi</artifactId>
+	<version>1.0.0-RELEASE</version>
+	<name>books.management.openapi</name>
+	<description>Books Management OpenApi Service</description>
+	<properties>
+		<java.version>21</java.version>
+		<openapi-package>com.digicert.openApi.model</openapi-package>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>2.2.34</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.6</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>7.12.0</version>
+				<executions>
+					<execution>
+						<id>generate-payment-server-apis</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/books-management.yaml</inputSpec>
+							<!--Specifies the type of code generator to use-->
+							<generatorName>spring</generatorName>
+							<apiPackage>${openapi-package}.service.api</apiPackage>
+							<modelPackage>${openapi-package}.service.model</modelPackage>
+							<configOptions>
+								<packageName>${openapi-package}</packageName>
+								<basePackage>${openapi-package}</basePackage>
+								<configPackage>${openapi-package}</configPackage>
+								<dateLibrary>java21</dateLibrary>
+								<interfaceOnly>true</interfaceOnly>
+								<delegatePattern>true</delegatePattern>
+								<useResponseEntity>true</useResponseEntity>
+								<useSpringBoot3>true</useSpringBoot3>
+								<skipOverwrite>true</skipOverwrite>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.3.1</version>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
