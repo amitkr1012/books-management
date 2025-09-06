@@ -11,6 +11,7 @@ paths:
   /books:
     get:
       summary: List books with paging & sorting
+      operationId: fetchAllBook
       parameters:
         - name: page
           in: query
@@ -22,7 +23,9 @@ paths:
           in: query
           schema:
             type: array
-            items: { type: string, example: title }
+            items:
+              type: string
+              example: title,asc
           style: form
           explode: true
       responses:
@@ -34,6 +37,7 @@ paths:
                 $ref: '#/components/schemas/PageBook'
     post:
       summary: Create a book
+      operationId: createBook
       requestBody:
         required: true
         content:
@@ -48,7 +52,7 @@ paths:
               schema: { type: string }
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/BookDTO' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
 
   /books/{id}:
     parameters:
@@ -58,6 +62,7 @@ paths:
         schema: { type: integer, format: int64}
     get:
       summary: Get a book by ID
+      operationId: getBookById
       responses:
         '200':
           description: Book found
@@ -67,42 +72,16 @@ paths:
               schema: { type: string }
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/BookDTO' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
         '404':
           description: Not Found
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CommonErrorResponse'}
+              schema: { $ref: '#/components/schemas/ResultStatus'}
 
     put:
       summary: Replace a book (requires version match)
-      parameters:
-        - name: If-Match
-          in: header
-          required: true
-          description: Version (ETag) of the resource
-          schema: { type: integer }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/BookRequest' }
-      responses:
-        '200':
-          description: Updated
-          headers:
-            ETag: { schema: { type: string }, description: New version }
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/BookDTO' }
-        '412':
-          description: Version conflict (optimistic locking failure)
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/CommonErrorResponse' }
-
-    patch:
-      summary: Update partial fields of a book (requires version match)
+      operationId: replaceBook
       parameters:
         - name: If-Match
           in: header
@@ -121,15 +100,44 @@ paths:
             ETag: { schema: { type: string }, description: New version }
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/BookDTO' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
+        '412':
+          description: Version conflict (optimistic locking failure)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResultStatus' }
+
+    patch:
+      summary: Update partial fields of a book (requires version match)
+      operationId: updateBook
+      parameters:
+        - name: If-Match
+          in: header
+          required: true
+          description: Version (ETag) of the resource
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BookUpdateRequest' }
+      responses:
+        '200':
+          description: Updated
+          headers:
+            ETag: { schema: { type: string }, description: New version }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResultStatus' }
         '412':
           description: Version conflict
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CommonErrorResponse' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
 
     delete:
       summary: Delete a book (requires version match)
+      operationId: deleteBookById
       parameters:
         - name: If-Match
           in: header
@@ -141,17 +149,17 @@ paths:
           description: Book Deleted
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/BookDTO' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
         '204':
           description: Deleted
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CommonErrorResponse' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
         '412':
           description: Version conflict
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CommonErrorResponse' }
+              schema: { $ref: '#/components/schemas/ResultStatus' }
 
 
 components:
@@ -191,15 +199,18 @@ components:
         totalPages: { type: integer }
         first: { type: boolean }
         last: { type: boolean }
-    CommonErrorResponse:
+    ResultStatus:
       type: object
-      description: Service Response Result Status
+      description: Service ResultStatus
       properties:
-        errorCode:
-          description: Error Code
-          type: integer
-        errorMessage:
-          description: Error Message
+        status:
+          description: status of service SUCCESS/FAILED
           type: string
+        message:
+          description: service success/failure Message
+          type: string
+        bookRes:
+          $ref: '#/components/schemas/BookDTO'
       required:
-        - errorMessage
+        - status
+

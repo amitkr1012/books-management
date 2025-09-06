@@ -12,7 +12,7 @@ public interface BooksService {
 
     BookDTO create(BookRequest request);
 
-    BookDTO replace(Long id, BookRequest request, int version);
+    BookDTO replace(Long id, BookUpdateRequest request, int version);
 
     BookDTO updatePartial(Long id, BookUpdateRequest request, int version);
 

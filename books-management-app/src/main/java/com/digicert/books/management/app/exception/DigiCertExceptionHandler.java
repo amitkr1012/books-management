@@ -1,6 +1,6 @@
 package com.digicert.books.management.app.exception;
 
-import com.digicert.openApi.model.service.model.CommonErrorResponse;
+import com.digicert.openApi.model.service.model.ResultStatus;
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,27 +12,29 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class DigiCertExceptionHandler {
 
+    private static final String FAILED="FAILED";
+
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<CommonErrorResponse> handleNotFound(NoSuchElementException ex) {
-        CommonErrorResponse cr=new CommonErrorResponse();
-        cr.setErrorCode(404);
-        cr.setErrorMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cr);
+    public ResponseEntity<ResultStatus> handleNotFound(NoSuchElementException ex) {
+        ResultStatus rs=new ResultStatus();
+        rs.status(FAILED);
+        rs.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(rs);
     }
 
     @ExceptionHandler(OptimisticLockException.class)
-    public ResponseEntity<CommonErrorResponse> handleConflict(OptimisticLockException ex) {
-        CommonErrorResponse cr=new CommonErrorResponse();
-        cr.setErrorMessage(ex.getMessage());
-        cr.setErrorCode(412);
-        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(cr);
+    public ResponseEntity<ResultStatus> handleConflict(OptimisticLockException ex) {
+        ResultStatus rs=new ResultStatus();
+        rs.status(FAILED);
+        rs.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(rs);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<CommonErrorResponse> handleBadRequest(IllegalArgumentException ex) {
-        CommonErrorResponse cr =new CommonErrorResponse();
-        cr.setErrorCode(400);
-        cr.errorMessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(cr);
+    public ResponseEntity<ResultStatus> handleBadRequest(IllegalArgumentException ex) {
+        ResultStatus rs=new ResultStatus();
+        rs.status(FAILED);
+        rs.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(rs);
     }
 }

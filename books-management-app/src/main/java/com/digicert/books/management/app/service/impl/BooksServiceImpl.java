@@ -30,7 +30,7 @@ public class BooksServiceImpl implements BooksService {
     public BookDTO findById(Long id) {
         Optional<Book> byId = bookDao.findById(id);
         return byId.map(bookMngtDatamapper::toBookDTO).orElseThrow(
-                ()->new NoSuchElementException("Book Not Found : "+id));
+                ()->new NoSuchElementException("Book Not Found for bookId: "+id));
     }
 
     @Override
@@ -56,9 +56,9 @@ public class BooksServiceImpl implements BooksService {
 
     @Override
     @Transactional
-    public BookDTO replace(Long id, BookRequest request, int version) {
+    public BookDTO replace(Long id, BookUpdateRequest request, int version) {
         Book book = bookDao.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Book not found: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Book not found for bookId: " + id));
 
         // Optimistic lock check
         if (version!=(book.getVersion())) {
@@ -76,7 +76,7 @@ public class BooksServiceImpl implements BooksService {
     @Override
     public BookDTO updatePartial(Long id, BookUpdateRequest request, int version) {
         Book book = bookDao.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Book not found: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Book not found for bookId: " + id));
 
         if (version!=(book.getVersion())) {
             throw new OptimisticLockException("Version conflict for book id=" + id);
@@ -94,16 +94,16 @@ public class BooksServiceImpl implements BooksService {
     @Override
     public BookDTO delete(Long id, int version) {
         Book book = bookDao.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Book not found: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Book not found for bookId: " + id));
 
         if (version!=(book.getVersion())) {
-            throw new OptimisticLockException("Version conflict for book id=" + id);
+            throw new OptimisticLockException("Version conflict for bookId=" + id);
         }
 
         try {
             bookDao.delete(book);
         } catch (EmptyResultDataAccessException ex) {
-            throw new NoSuchElementException("Book not found: " + id);
+            throw new NoSuchElementException("Book not found for bookId: " + id);
         }
         return  bookMngtDatamapper.toBookDTO(book);
     }
