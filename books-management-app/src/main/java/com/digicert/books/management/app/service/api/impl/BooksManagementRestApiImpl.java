@@ -31,7 +31,10 @@ public class BooksManagementRestApiImpl implements BooksApi {
     @Override
     public ResponseEntity<PageBook> fetchAllBook(Integer page, Integer size, List<String> sort) {
         String[] sort2 = servletRequest.getParameterValues("sort");
-        Pageable pageable=bookMngtDatamapper.toPageable(page,size,Arrays.asList(sort2));
+        if(sort2!=null&& sort2.length>0){
+            sort=Arrays.asList(sort2);
+        }
+        Pageable pageable=bookMngtDatamapper.toPageable(page,size,sort);
         PageBook pb = booksService.findAll(pageable);
         return ResponseEntity.ok(pb);
     }
