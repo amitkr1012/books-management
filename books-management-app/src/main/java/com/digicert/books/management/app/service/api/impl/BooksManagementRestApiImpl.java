@@ -4,14 +4,15 @@ import com.digicert.books.management.app.datamapper.BookMngtDatamapper;
 import com.digicert.books.management.app.service.BooksService;
 import com.digicert.openApi.model.service.api.BooksApi;
 import com.digicert.openApi.model.service.model.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -24,15 +25,13 @@ public class BooksManagementRestApiImpl implements BooksApi {
 
     private static final String SUCCESS="SUCCESS";
 
-    @GetMapping("/findAll")
-    public  ResponseEntity<PageBook> findAll(Pageable page){
-        PageBook pb = booksService.findAll(page);
-        return ResponseEntity.ok(pb);
-    }
+    @Autowired
+    HttpServletRequest servletRequest;
 
     @Override
     public ResponseEntity<PageBook> fetchAllBook(Integer page, Integer size, List<String> sort) {
-        Pageable pageable=bookMngtDatamapper.toPageable(page,size,sort);
+        String[] sort2 = servletRequest.getParameterValues("sort");
+        Pageable pageable=bookMngtDatamapper.toPageable(page,size,Arrays.asList(sort2));
         PageBook pb = booksService.findAll(pageable);
         return ResponseEntity.ok(pb);
     }
